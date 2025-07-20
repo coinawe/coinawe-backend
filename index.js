@@ -15,22 +15,26 @@ app.use("/escrow", escrowRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-app.use(express.json()); // pastikan ini di atas
 
 app.post('/webhook', async (req, res) => {
-  console.log('Webhook received:', req.body);
+  console.log("✅ Webhook hit");
+  console.log("📦 Payload:", JSON.stringify(req.body));
 
   const message = req.body.message;
   if (message) {
     const chatId = message.chat.id;
     const text = message.text;
 
-    // Kirim balasan
-    await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
-      chat_id: chatId,
-      text: `Hai! Kamu mengirim: ${text}`,
-    });
+    try {
+      await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
+        chat_id: chatId,
+        text: `Hai! Kamu mengirim: ${text}`,
+      });
+      console.log("📨 Reply sent");
+    } catch (err) {
+      console.error("❌ Failed to send reply:", err.message);
+    }
   }
 
-  res.send('ok');
+  res.send("ok");
 });
